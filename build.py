@@ -23,16 +23,13 @@ def get_protobuf_service_def(project):
     protobuf_url = "https://raw.githubusercontent.com/NicoOhR/GV3B_simulation/refs/heads/main/proto/simulation.proto"
     response = requests.get(protobuf_url)
     if response.status_code == 200:
-        proto_dir = os.path.join(project.basedir, "src/main/proto/")
-        proto_file = os.path.join(proto_dir, "simulation.proto")
-        generated_dir = os.path.join(
-            project.basedir, project.get_property("dir_source_main_python"), "generated"
+        proto_dir = os.path.join(
+            project.get_property("dir_source_main_python"), "proto"
         )
+        proto_file = os.path.join(proto_dir, "simulation.proto")
         project.set_property("proto_dir", proto_dir)
         project.set_property("proto_file", proto_file)
-        project.set_property("proto_output_path", generated_dir)
         os.makedirs(proto_dir, exist_ok=True)
-        os.makedirs(generated_dir, exist_ok=True)
         with open(proto_file, "wb") as file:
             file.write(response.content)
             print("[Builder] Successfuly got latest protobuf")
@@ -45,15 +42,15 @@ def get_protobuf_service_def(project):
 def build_proto_buf(project):
     proto_file = project.get_property("proto_file")
     proto_dir = project.get_property("proto_dir")
-    proto_output_path = project.get_property("proto_output_path")
+    module_file = os.path.join(proto_dir, "__init__.py")
     command = [
         "python3",
         "-m",
         "grpc_tools.protoc",
         "-I",
         proto_dir,
-        f"--python_out={proto_output_path}",
-        f"--grpc_python_out={proto_output_path}",
+        f"--python_out={proto_dir}",
+        f"--grpc_python_out={proto_dir}",
         proto_file,
     ]
 
@@ -68,3 +65,6 @@ def build_proto_buf(project):
         )
     except Exception as e:
         print(f"[Builder] An unexpected error occurred: {e}")
+
+    with open(module_file, "a"):
+        pass
