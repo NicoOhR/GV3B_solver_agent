@@ -8,6 +8,7 @@ service Sim {
 
 message SimReq{
   optional string bodyID = 1;
+  optional bool reset = 2;
 }
 
 message Vec2D{
@@ -17,6 +18,7 @@ message Vec2D{
 message BodyAttributes{
   Vec2D velocity = 1;
   Vec2D position = 2;
+  uint32 bodyID = 3;
 }
 message SimResponse{
   repeated BodyAttributes bodies = 1;
