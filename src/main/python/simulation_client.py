@@ -8,11 +8,10 @@ from proto import simulation_pb2
 from proto import simulation_pb2_grpc
 
 
-def set_configuration(channel, bodies):
+def set_configuration(stub, bodies):
     """
     Calls the SetConfiguration RPC to set the simulation configuration.
     """
-    stub = simulation_pb2_grpc.SimStub(channel)
     sim_state = simulation_pb2.SimState(
         bodies=[
             simulation_pb2.BodyAttributes(
@@ -32,8 +31,10 @@ def set_configuration(channel, bodies):
     print("Configuration Valid:", response.succeeded)
 
 
-def body_request(channel):
-    stub = simulation_pb2_grpc.SimStub(channel)
+def body_request(stub):
+    """
+    Requests the location, velocity, and mass of bodies in the current simulation
+    """
     request = simulation_pb2.SimCurrentStateReq()
     try:
         response = stub.StateReply(request)
@@ -45,7 +46,7 @@ def body_request(channel):
 if __name__ == "__main__":
     server_address = "0.0.0.0:50051"
     body_history = []
-    bodies = [
+    bodies1 = [
         {
             "bodyID": 1,
             "position": {"x": -200.0, "y": 0.0},
@@ -59,11 +60,27 @@ if __name__ == "__main__":
             "mass": 20.0,
         },
     ]
+    bodies2 = [
+        {
+            "bodyID": 1,
+            "position": {"x": -200.0, "y": -100.0},
+            "velocity": {"x": 20.0, "y": 1.0},
+            "mass": 10.0,
+        },
+        {
+            "bodyID": 2,
+            "position": {"x": 200.0, "y": 100.0},
+            "velocity": {"x": -20.0, "y": -1.0},
+            "mass": 20.0,
+        },
+    ]
 
     with grpc.insecure_channel(server_address) as channel:
-        set_configuration(channel, bodies)
+        stub = simulation_pb2_grpc.SimStub(channel)
+        set_configuration(stub, bodies1)
         while True:
             time.sleep(5)
-            body_state = body_request(channel)
+            body_state = body_request(stub)
+            set_configuration(stub, bodies2)
             print(f"{body_state}")
             body_history.append(body_state)
