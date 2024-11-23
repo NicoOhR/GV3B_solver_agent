@@ -34,17 +34,28 @@ class SimStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Replies = channel.unary_unary(
-                '/simulation.Sim/Replies',
-                request_serializer=simulation__pb2.SimReq.SerializeToString,
-                response_deserializer=simulation__pb2.SimResponse.FromString,
+        self.StateReply = channel.unary_unary(
+                '/simulation.Sim/StateReply',
+                request_serializer=simulation__pb2.SimCurrentStateReq.SerializeToString,
+                response_deserializer=simulation__pb2.SimState.FromString,
+                _registered_method=True)
+        self.SetConfiguration = channel.unary_unary(
+                '/simulation.Sim/SetConfiguration',
+                request_serializer=simulation__pb2.SimState.SerializeToString,
+                response_deserializer=simulation__pb2.ConfigValid.FromString,
                 _registered_method=True)
 
 
 class SimServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def Replies(self, request, context):
+    def StateReply(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SetConfiguration(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,10 +64,15 @@ class SimServicer(object):
 
 def add_SimServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Replies': grpc.unary_unary_rpc_method_handler(
-                    servicer.Replies,
-                    request_deserializer=simulation__pb2.SimReq.FromString,
-                    response_serializer=simulation__pb2.SimResponse.SerializeToString,
+            'StateReply': grpc.unary_unary_rpc_method_handler(
+                    servicer.StateReply,
+                    request_deserializer=simulation__pb2.SimCurrentStateReq.FromString,
+                    response_serializer=simulation__pb2.SimState.SerializeToString,
+            ),
+            'SetConfiguration': grpc.unary_unary_rpc_method_handler(
+                    servicer.SetConfiguration,
+                    request_deserializer=simulation__pb2.SimState.FromString,
+                    response_serializer=simulation__pb2.ConfigValid.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -70,7 +86,7 @@ class Sim(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Replies(request,
+    def StateReply(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +99,36 @@ class Sim(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/simulation.Sim/Replies',
-            simulation__pb2.SimReq.SerializeToString,
-            simulation__pb2.SimResponse.FromString,
+            '/simulation.Sim/StateReply',
+            simulation__pb2.SimCurrentStateReq.SerializeToString,
+            simulation__pb2.SimState.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SetConfiguration(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/simulation.Sim/SetConfiguration',
+            simulation__pb2.SimState.SerializeToString,
+            simulation__pb2.ConfigValid.FromString,
             options,
             channel_credentials,
             insecure,

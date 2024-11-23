@@ -8,15 +8,35 @@ from proto import simulation_pb2
 from proto import simulation_pb2_grpc
 
 
-def body_request(server_address, channel):
+def set_configuration(channel, bodies):
+    """
+    Calls the SetConfiguration RPC to set the simulation configuration.
+    """
     stub = simulation_pb2_grpc.SimStub(channel)
-    request = simulation_pb2.SimReq(reset=True)
+    sim_state = simulation_pb2.SimState(
+        bodies=[
+            simulation_pb2.BodyAttributes(
+                bodyID=body["bodyID"],
+                position=simulation_pb2.Vec2D(
+                    x=body["position"]["x"], y=body["position"]["y"]
+                ),
+                velocity=simulation_pb2.Vec2D(
+                    x=body["velocity"]["x"], y=body["velocity"]["y"]
+                ),
+                mass=body["mass"],
+            )
+            for body in bodies
+        ]
+    )
+    response = stub.SetConfiguration(sim_state)
+    print("Configuration Valid:", response.succeeded)
+
+
+def body_request(channel):
+    stub = simulation_pb2_grpc.SimStub(channel)
+    request = simulation_pb2.SimCurrentStateReq()
     try:
-        response = stub.Replies(request)
-        # print("Response received:")
-        # for body in response.bodies:
-        #    print(f"Velocity: x={body.velocity.x}, y={body.velocity.y}")
-        #    print(f"Position: x={body.position.x}, y={body.position.y}")
+        response = stub.StateReply(request)
         return response.bodies
     except grpc.RpcError as e:
         print(f"gRPC call failed: {e.code()}: {e.details()}")
@@ -24,7 +44,26 @@ def body_request(server_address, channel):
 
 if __name__ == "__main__":
     server_address = "0.0.0.0:50051"
+    body_history = []
+    bodies = [
+        {
+            "bodyID": 1,
+            "position": {"x": -200.0, "y": 0.0},
+            "velocity": {"x": 20.0, "y": 1.0},
+            "mass": 10.0,
+        },
+        {
+            "bodyID": 2,
+            "position": {"x": 200.0, "y": 5.0},
+            "velocity": {"x": -20.0, "y": -1.0},
+            "mass": 20.0,
+        },
+    ]
+
     with grpc.insecure_channel(server_address) as channel:
+        set_configuration(channel, bodies)
         while True:
             time.sleep(5)
-            print(f"{body_request(server_address, channel)}")
+            body_state = body_request(channel)
+            print(f"{body_state}")
+            body_history.append(body_state)
