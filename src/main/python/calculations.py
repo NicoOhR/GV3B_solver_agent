@@ -1,11 +1,24 @@
 import numpy as np
 import math
+import itertools
 
 
 def collision(bodies):
     """
     If body positions are within radius of one another we fail the cost function
     """
+    combinations = itertools.combinations(bodies, 2)
+    collision_flag = False
+    for combination in combinations:
+        b1, b2 = combination
+        vec1 = np.array([b1.position.x, b1.position.y])
+        vec2 = np.array([b2.position.x, b2.position.y])
+        distance = np.linalg.norm(vec1 - vec2)
+        print(distance)
+        if round(distance, 2) <= 80.0:
+            collision_flag = True
+
+    return collision_flag
 
 
 def too_far():
