@@ -36,14 +36,17 @@ body_configuration = [
 def main():
     server_address = "0.0.0.0:50051"
     energy = [[]]
-    with grpc.insecure_channel(server_address) as channel:
-        stub = simulation_pb2_grpc.SimStub(channel)
-        set_configuration(stub, body_configuration)
-        while True:
-            body_state = body_request(stub)
-            if body_state:
-                if collision(body_state):
-                    set_configuration(stub, body_configuration)
+    try:
+        with grpc.insecure_channel(server_address) as channel:
+            stub = simulation_pb2_grpc.SimStub(channel)
+            set_configuration(stub, body_configuration)
+            while True:
+                body_state = body_request(stub)
+                if body_state:
+                    if collision(body_state):
+                        set_configuration(stub, body_configuration)
+    except KeyboardInterrupt:
+        print("[Agent] Stopping Agent")
 
 
 if __name__ == "__main__":
