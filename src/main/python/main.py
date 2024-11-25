@@ -2,7 +2,7 @@ import time
 import sys
 
 from simulation_client import body_request, set_configuration
-from calculations import calculate_energy, collision
+from calculations import calculate_energy, collision, too_far
 
 sys.path.append("./proto")
 
@@ -15,7 +15,7 @@ body_configuration = [
     {
         "bodyID": 1,
         "position": {"x": -150.0, "y": 0.0},
-        "velocity": {"x": 0.0, "y": 15.0},
+        "velocity": {"x": 0.0, "y": 50.0},
         "mass": 10.0,
     },
     {
@@ -43,7 +43,7 @@ def main():
             while True:
                 body_state = body_request(stub)
                 if body_state:
-                    if collision(body_state):
+                    if too_far(body_state):
                         set_configuration(stub, body_configuration)
     except KeyboardInterrupt:
         print("[Agent] Stopping Agent")

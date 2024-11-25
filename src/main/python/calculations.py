@@ -21,11 +21,22 @@ def collision(bodies):
     return collision_flag
 
 
-def too_far():
+def too_far(bodies):
     """
-    if a body is no longer effect by the gravitational force of the others,
+    If a body is no longer effect by the gravitational force of the others,
     we fail the cost function
     """
+    combinations = itertools.combinations(bodies, 2)
+    distance_flag = False
+    for combination in combinations:
+        b1, b2 = combination
+        vec1 = np.array([b1.position.x, b1.position.y])
+        vec2 = np.array([b2.position.x, b2.position.y])
+        distance = np.linalg.norm(vec1 - vec2)
+        g_f = (b1.mass * b2.mass) / (distance**2)
+        if round(g_f, 3) == 0:
+            distance_flag = True
+    return distance_flag
 
 
 def cost(energies):
