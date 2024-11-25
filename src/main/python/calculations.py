@@ -13,6 +13,7 @@ def collision(bodies):
     collision_flag = False
     for combination in combinations:
         b1, b2 = combination
+        print(type(b1.position.y))
         vec1 = np.array([b1.position.x, b1.position.y])
         vec2 = np.array([b2.position.x, b2.position.y])
         distance = np.linalg.norm(vec1 - vec2)
@@ -24,7 +25,7 @@ def collision(bodies):
 
 def escape(bodies):
     """
-    Returns tru if a body is no longer effect by the gravitational force of one of the others
+    Returns true if a body is no longer effect by the gravitational force of one of the others
     """
     combinations = itertools.combinations(bodies, 2)
     distance_flag = False
@@ -34,22 +35,27 @@ def escape(bodies):
         vec2 = np.array([b2.position.x, b2.position.y])
         distance = np.linalg.norm(vec1 - vec2)
         g_f = (b1.mass * b2.mass) / (distance**2)
-        if round(g_f, 3) == 0:
+        if round(g_f, 5) == 0:
             distance_flag = True
     return distance_flag
 
 
 def runtime(initial_configuration, stub):
+    """
+    Run the simulation with the passed in initial conditions until a failstate is achieved
+    """
     set_configuration(initial_configuration, stub)
-    bodies = body_request(stub)
-    if bodies:
-        start_time = time.time()
-        while True:
-            if escape(bodies) or collision(bodies):
-                break
-            bodies = body_request(stub)
-        end_time = time.time()
-        return end_time - start_time
+    start_time = time.time()
+    while True:
+        time.sleep(0.1)
+        req = body_request(stub)
+        if not req or not req.bodies:
+            continue
+        bodies = req.bodies
+        if escape(bodies) or collision(bodies):
+            break
+    end_time = time.time()
+    return end_time - start_time
 
 
 def calculate_energy(mass, velocity):

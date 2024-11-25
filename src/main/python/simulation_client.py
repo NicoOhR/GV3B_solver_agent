@@ -39,49 +39,6 @@ def body_request(stub):
     request = simulation_pb2.SimCurrentStateReq()
     try:
         response = stub.StateReply(request)
-        return response.bodies
+        return response
     except grpc.RpcError as e:
         print(f"gRPC call failed: {e.code()}: {e.details()}")
-
-
-if __name__ == "__main__":
-    server_address = "0.0.0.0:50051"
-    body_history = []
-    bodies1 = [
-        {
-            "bodyID": 1,
-            "position": {"x": -200.0, "y": 0.0},
-            "velocity": {"x": 20.0, "y": 1.0},
-            "mass": 10.0,
-        },
-        {
-            "bodyID": 2,
-            "position": {"x": 200.0, "y": 5.0},
-            "velocity": {"x": -20.0, "y": -1.0},
-            "mass": 20.0,
-        },
-    ]
-    bodies2 = [
-        {
-            "bodyID": 1,
-            "position": {"x": -200.0, "y": -100.0},
-            "velocity": {"x": 20.0, "y": 1.0},
-            "mass": 10.0,
-        },
-        {
-            "bodyID": 2,
-            "position": {"x": 200.0, "y": 100.0},
-            "velocity": {"x": -20.0, "y": -1.0},
-            "mass": 20.0,
-        },
-    ]
-
-    with grpc.insecure_channel(server_address) as channel:
-        stub = simulation_pb2_grpc.SimStub(channel)
-        set_configuration(stub, bodies1)
-        while True:
-            time.sleep(5)
-            body_state = body_request(stub)
-            set_configuration(stub, bodies2)
-            print(f"{body_state}")
-            body_history.append(body_state)

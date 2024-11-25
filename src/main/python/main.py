@@ -14,21 +14,21 @@ from proto import simulation_pb2_grpc
 body_configuration = [
     {
         "bodyID": 1,
-        "position": {"x": -150.0, "y": 0.0},
-        "velocity": {"x": 0.0, "y": 50.0},
+        "position": {"x": -150.0, "y": 10.0},
+        "velocity": {"x": 0.0, "y": 0.0},
         "mass": 10.0,
     },
     {
         "bodyID": 2,
-        "position": {"x": 200.0, "y": 0.0},
-        "velocity": {"x": 0.0, "y": -15.0},
-        "mass": 15.0,
+        "position": {"x": 200.0, "y": 1.0},
+        "velocity": {"x": 0.0, "y": 0.0},
+        "mass": 10.0,
     },
     {
         "bodyID": 3,
-        "position": {"x": 0.0, "y": 0.0},
+        "position": {"x": 1.0, "y": 1.0},
         "velocity": {"x": 0.0, "y": 0.0},
-        "mass": 50.0,
+        "mass": 10.0,
     },
 ]
 
