@@ -8,10 +8,11 @@ from proto import simulation_pb2
 from proto import simulation_pb2_grpc
 
 
-def set_configuration(stub, bodies):
+def set_configuration(bodies, stub):
     """
     Calls the SetConfiguration RPC to set the simulation configuration.
     """
+    print("making configuration")
     sim_state = simulation_pb2.SimState(
         bodies=[
             simulation_pb2.BodyAttributes(

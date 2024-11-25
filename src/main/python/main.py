@@ -2,7 +2,7 @@ import time
 import sys
 
 from simulation_client import body_request, set_configuration
-from calculations import calculate_energy, collision, too_far
+from calculations import calculate_energy, collision, escape, runtime
 
 sys.path.append("./proto")
 
@@ -35,16 +35,11 @@ body_configuration = [
 
 def main():
     server_address = "0.0.0.0:50051"
-    energy = [[]]
+
     try:
         with grpc.insecure_channel(server_address) as channel:
             stub = simulation_pb2_grpc.SimStub(channel)
-            set_configuration(stub, body_configuration)
-            while True:
-                body_state = body_request(stub)
-                if body_state:
-                    if too_far(body_state):
-                        set_configuration(stub, body_configuration)
+            print(runtime(body_configuration, stub))
     except KeyboardInterrupt:
         print("[Agent] Stopping Agent")
 
