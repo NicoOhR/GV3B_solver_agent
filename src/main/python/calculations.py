@@ -13,7 +13,6 @@ def collision(bodies):
     collision_flag = False
     for combination in combinations:
         b1, b2 = combination
-        print(type(b1.position.y))
         vec1 = np.array([b1.position.x, b1.position.y])
         vec2 = np.array([b2.position.x, b2.position.y])
         distance = np.linalg.norm(vec1 - vec2)
@@ -40,10 +39,46 @@ def escape(bodies):
     return distance_flag
 
 
-def runtime(initial_configuration, stub):
+def create_config(body_positions):
+    """
+    Creates a body configuration of equal mass from the position of two
+    """
+
+    body_configuration = [
+        {
+            "bodyID": 1,
+            "position": {"x": 0.0, "y": 0.0},
+            "velocity": {"x": 0.0, "y": 0.0},
+            "mass": 10.0,
+        },
+        {
+            "bodyID": 2,
+            "position": {"x": 0.0, "y": 0.0},
+            "velocity": {"x": 0.0, "y": 0.0},
+            "mass": 10.0,
+        },
+        {
+            "bodyID": 3,
+            "position": {"x": 0.0, "y": 0.0},
+            "velocity": {"x": 0.0, "y": 0.0},
+            "mass": 10.0,
+        },
+    ]
+    for body in body_configuration:
+        if body["bodyID"] == 1:
+            body["position"] = {"x": body_positions[0], "y": body_positions[1]}
+        elif body["bodyID"] == 2:
+            body["position"] = {"x": body_positions[2], "y": body_positions[3]}
+
+    return body_configuration
+
+def runtime(body_positions, stub):
     """
     Run the simulation with the passed in initial conditions until a failstate is achieved
     """
+
+    initial_configuration = create_config(body_positions)
+
     set_configuration(initial_configuration, stub)
     start_time = time.time()
     while True:

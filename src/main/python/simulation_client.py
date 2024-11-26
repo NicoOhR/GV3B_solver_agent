@@ -12,7 +12,6 @@ def set_configuration(bodies, stub):
     """
     Calls the SetConfiguration RPC to set the simulation configuration.
     """
-    print("making configuration")
     sim_state = simulation_pb2.SimState(
         bodies=[
             simulation_pb2.BodyAttributes(
@@ -29,7 +28,6 @@ def set_configuration(bodies, stub):
         ]
     )
     response = stub.SetConfiguration(sim_state)
-    print("Configuration Valid:", response.succeeded)
 
 
 def body_request(stub):

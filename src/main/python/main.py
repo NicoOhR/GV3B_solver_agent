@@ -1,8 +1,10 @@
 import time
 import sys
-
+import numpy as np
 from simulation_client import body_request, set_configuration
 from calculations import calculate_energy, collision, escape, runtime
+import scipy
+from scipy import optimize
 
 sys.path.append("./proto")
 
@@ -11,35 +13,19 @@ from proto import simulation_pb2
 from proto import simulation_pb2_grpc
 
 
-body_configuration = [
-    {
-        "bodyID": 1,
-        "position": {"x": -150.0, "y": 10.0},
-        "velocity": {"x": 0.0, "y": 0.0},
-        "mass": 10.0,
-    },
-    {
-        "bodyID": 2,
-        "position": {"x": 200.0, "y": 1.0},
-        "velocity": {"x": 0.0, "y": 0.0},
-        "mass": 10.0,
-    },
-    {
-        "bodyID": 3,
-        "position": {"x": 1.0, "y": 1.0},
-        "velocity": {"x": 0.0, "y": 0.0},
-        "mass": 10.0,
-    },
-]
-
-
 def main():
     server_address = "0.0.0.0:50051"
-
+    body_configuration = np.array([200,0,-200,0])
+    learning_rate = 0.1
     try:
         with grpc.insecure_channel(server_address) as channel:
             stub = simulation_pb2_grpc.SimStub(channel)
-            print(runtime(body_configuration, stub))
+            with grpc.insecure_channel(server_address) as channel:
+                stub = simulation_pb2_grpc.SimStub(channel)
+                result = optimize.minimize(lambda c: runtime(c, stub), body_configuration, method='Nelder-Mead')
+                optimal = result.x
+                print(optimal)
+                
     except KeyboardInterrupt:
         print("[Agent] Stopping Agent")
 

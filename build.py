@@ -16,6 +16,8 @@ def set_properties(project):
     project.build_depends_on("grpcio")
     project.build_depends_on("grpcio-tools")
     project.build_depends_on("protobuf")
+    project.build_depends_on("torch")
+    project.build_depends_on("numpy")
 
 
 @task
