@@ -34,7 +34,7 @@ def escape(bodies):
         vec2 = np.array([b2.position.x, b2.position.y])
         distance = np.linalg.norm(vec1 - vec2)
         g_f = (b1.mass * b2.mass) / (distance**2)
-        if round(g_f, 5) == 0:
+        if round(g_f, 3) == 0:
             distance_flag = True
     return distance_flag
 
